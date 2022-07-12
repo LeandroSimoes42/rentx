@@ -8,6 +8,7 @@ import { useTheme } from 'styled-components'
 import HomeSvg from '../assets/home.svg'
 import PeopleSvg from '../assets/people.svg'
 import CarSvg from '../assets/car.svg'
+import Profile from '../screens/Profile'
 
 export default function AppTabRoutes() {
     const { Navigator, Screen } = createBottomTabNavigator()
@@ -47,7 +48,7 @@ export default function AppTabRoutes() {
           />
           <Screen 
             name='Profile' 
-            component={Home}
+            component={Profile}
             options={{
               tabBarIcon: ({ color, size }) => {
                 return <PeopleSvg width={size} height={size} fill={color}/>

@@ -1,5 +1,5 @@
 import { View, Text, StatusBar, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Footer, Form, Header, Subtitle, Title } from './styles'
 import Button from '../../components/Button'
 import { useTheme } from 'styled-components'
@@ -33,6 +33,8 @@ export default function SignIn() {
             }
         }
     }
+
+
 
     const newAccount = () => {
         navigate('FirstStepSignUp')

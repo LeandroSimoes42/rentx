@@ -32,7 +32,7 @@ export default function InputPassword({ iconName, value, ...rest }:Props) {
           <IconContainer focused={focused}>
               <Feather  name={iconName} size={24} color={(focused || isFilled) ? theme.colors.main : theme.colors.text_detail}/>
           </IconContainer>
-          <InputText focused={focused} onFocus={() => handleIsFocused()} onBlur={() => handleOnBlur()} secureTextEntry={isVisible} {...rest} />
+          <InputText focused={focused} onFocus={() => handleIsFocused()} onBlur={() => handleOnBlur()} secureTextEntry={isVisible} autoCorrect={false} {...rest} />
           <BorderlessButton onPress={() => setIsVisible(!isVisible)}>
             <IconContainer focused={focused}>
               <Feather  name={isVisible ? 'eye' : 'eye-off'} size={24} color={theme.colors.text_detail}/>

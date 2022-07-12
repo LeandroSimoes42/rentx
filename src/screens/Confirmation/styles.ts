@@ -18,6 +18,7 @@ export const Content = styled.View`
 
 
 export const Title = styled.Text`
+    height: 48px;
     font-family: ${({ theme }) => theme.fonts.secondary_600};
     font-size: ${RFValue(30)}px;
     color: ${({ theme }) => theme.colors.shape};
@@ -27,6 +28,8 @@ export const Title = styled.Text`
 
 
 export const Message = styled.Text`
+    width: 210px;
+    height: 100px;
     font-family: ${({ theme }) => theme.fonts.primary_400};
     font-size: ${RFValue(15)}px;
     color: ${({ theme }) => theme.colors.text_detail};

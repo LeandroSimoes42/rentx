@@ -16,33 +16,44 @@ import {
   CarFooterDate,
  } from './styles'
 import { Cars } from '../../model/cars'
+import { Cars as ModelCar } from '../../database/model/car'
 import api from '../../services/api'
 import BackButton from '../../components/BackButton'
-import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native'
+import { NavigationProp, ParamListBase, useIsFocused, useNavigation } from '@react-navigation/native'
 import { useTheme } from 'styled-components'
 import CardCar from '../../components/CardCar'
 import { AntDesign } from '@expo/vector-icons'
 import LoadAnimated from '../../components/LoadAnimated'
+import { format, parseISO } from 'date-fns'
 
-interface ScheduledCarsProps{
-  car: Cars;
+interface DataProps{
+  car: ModelCar;
   id: number;
   user_id: number;
-  startDate: string;
-  endDate: string;
+  start_date: string;
+  end_date: string;
 }
 
 export default function Mycars() {
-  const [cars, setCars] = useState<ScheduledCarsProps[]>([])
+  const [cars, setCars] = useState<DataProps[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const { navigate, goBack }: NavigationProp<ParamListBase> = useNavigation()
+  const { goBack }: NavigationProp<ParamListBase> = useNavigation()
   const theme = useTheme()
+  const screenIsFocus = useIsFocused()
 
   useEffect(() => {
     const getCars = async () => {
       try {
-        const response = await api.get('schedules_byuser?user_id=1')
-        setCars(response.data ? response.data : []);
+        const response = await api.get('/rentals')
+        const dataFormatted = response.data.map((data: DataProps) => {
+          return{
+            id: data.id,
+            car: data.car,
+            start_date: format(parseISO(data.start_date), 'dd/MM/yyyy'),
+            end_date: format(parseISO(data.end_date), 'dd/MM/yyyy')
+          }
+        })
+        setCars(dataFormatted);
       } catch (error) {
         console.error
       }finally{
@@ -50,7 +61,7 @@ export default function Mycars() {
       }
     }
     getCars()
-  }, [])
+  }, [screenIsFocus])
   
   return (
     <Container>
@@ -74,7 +85,7 @@ export default function Mycars() {
                 <AppointmentsTitle>Agendamentos feitos</AppointmentsTitle>
                 <AppointmentsQuantity>{cars.length}</AppointmentsQuantity>
               </Appointments>
-              <FlatList<ScheduledCarsProps>
+              <FlatList<DataProps>
                 data={cars}
                 keyExtractor={item => String(item.id)}
                 showsVerticalScrollIndicator={false}
@@ -84,14 +95,14 @@ export default function Mycars() {
                     <CardCarFooter>
                       <CarFooterTitle>Periodo</CarFooterTitle>
                       <CarFooterPeriod>
-                        <CarFooterDate>{item.startDate}</CarFooterDate>
+                        <CarFooterDate>{item.start_date}</CarFooterDate>
                         <AntDesign
                           name='arrowright'
                           size={20}
                           color={theme.colors.title}
                           style={{ marginHorizontal: 10 }}
                         />
-                        <CarFooterDate>{item.endDate}</CarFooterDate>
+                        <CarFooterDate>{item.end_date}</CarFooterDate>
                       </CarFooterPeriod>
                     </CardCarFooter>
                   </CardCarWrapper>

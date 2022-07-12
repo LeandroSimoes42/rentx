@@ -1,4 +1,5 @@
 import { Dimensions } from "react-native";
+import FastImage from "react-native-fast-image";
 import styled from "styled-components/native";
 
 interface Props{
@@ -20,7 +21,7 @@ export const ImageIndex = styled.View<Props>`
     height: 6px;
     border-radius: 3px;
     margin-left: 8px;
-    background-color: ${({ theme, active }) => active ? theme.colors.title : theme.colors.shape}
+    background-color: ${({ theme, active }) => active ? theme.colors.title : theme.colors.shape};
 
 `
 export const ImageWrapper = styled.View`
@@ -30,7 +31,7 @@ export const ImageWrapper = styled.View`
     align-items: center;
 
 `
-export const CardImage = styled.Image`
+export const CardImage = styled(FastImage)`
     width: 280px;
     height: 132px;
 `

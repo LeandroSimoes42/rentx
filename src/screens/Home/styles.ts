@@ -1,7 +1,7 @@
 import { FlatList, FlatListProps, TouchableOpacity } from "react-native";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
-import { Cars } from "../../model/cars";
+import { Cars } from "../../database/model/car";
 
 export const Container = styled.View`
     flex: 1;

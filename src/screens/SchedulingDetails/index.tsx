@@ -38,6 +38,7 @@ import getAcessories from '../../utils/getAcessories'
 import getPlatformDate from '../../utils/getPlatformDate'
 import { format } from 'date-fns'
 import api from '../../services/api'
+import { useNetInfo } from '@react-native-community/netinfo'
 
 
 interface Params {
@@ -51,32 +52,25 @@ interface RentPeriod{
 }
 
 export default function SchedulingDetails() {
+  const [carUpdate, setCarUpdate] = useState<Cars>({} as Cars)
   const [isLoading, setIsLoading] = useState(false)
   const [rentPeriod, setRentPeriod] = useState<RentPeriod>({} as RentPeriod)
   const { navigate, goBack }: NavigationProp<ParamListBase> = useNavigation()
   const route = useRoute()
   const { car, dates } = route.params as Params;
-  const rentTotal = dates.length * car.rent.price
+  const rentTotal = dates.length * car.price
   const theme = useTheme()
+  const netInfo = useNetInfo()
 
   const handleConfirmSchedule = async () => {
     setIsLoading(true)
-    const response = await api.get(`/schedules_bycars/${car.id}`)
-    const datesUnavailable = response.data.unavailable_dates ? response.data.unavailable_dates : []
-    const unvailable_dates = [
-      ...datesUnavailable,
-      ...dates
-    ]
     try {
-      await api.put(`/schedules_bycars/${car.id}`, {
-        id: car.id,
-        unvailable_dates
-      })
-      await api.post(`/schedules_byuser`, {
+      await api.post(`rentals`, {
         user_id: 1,
-        car,
-        startDate: format(getPlatformDate(new Date(dates[0])), 'dd/MM/yyyy'),
-        endDate: format(getPlatformDate(new Date(dates[dates.length - 1])), 'dd/MM/yyyy'),
+        car_id: car.id,
+        start_date: new Date(dates[0]),
+        end_date: new Date(dates[dates.length - 1]),
+        total: rentTotal
       })
       setIsLoading(false)
       navigate('Confirmation', {
@@ -96,6 +90,17 @@ export default function SchedulingDetails() {
       end: format(getPlatformDate(new Date(dates[dates.length - 1])), 'dd/MM/yyyy'),
     })
   }, [])
+
+  useEffect(() => {
+    const fetchCarsUpdated = async () => {
+      const response = await api.get(`cars/${car.id}`)
+      setCarUpdate(response.data)
+    }
+    if(netInfo.isConnected === true){
+      fetchCarsUpdated()
+    }
+
+  }, [netInfo.isConnected])
   
   return (
     <Container>
@@ -103,7 +108,7 @@ export default function SchedulingDetails() {
         <BackButton onPress={() => goBack()}/>
       </Header>
       <CardImages>
-        <ImageSlider imageUrl={car.photos}/>
+        <ImageSlider imageUrl={!!carUpdate.photos ? carUpdate.photos : [{ id: car.thumbnail, photo: car.thumbnail }]}/>
       </CardImages>
       <Content>
         <Details>
@@ -112,15 +117,20 @@ export default function SchedulingDetails() {
             <Name>{car.name}</Name>
           </Description>
           <Rent>
-            <Period>{car.rent.period}</Period>
-            <Price>R$ {car.rent.price}</Price>
+            <Period>{car.period}</Period>
+            <Price>R$ {car.price}</Price>
           </Rent>
         </Details>
         <AcessoriesContainer>
         {
-            car.accessories.map((acessory, index) => (
-              <Acessory name={acessory.name} icon={getAcessories(acessory.type)} key={index}/>
-            ))
+          carUpdate.accessories &&
+            <AcessoriesContainer>
+              {
+                carUpdate.accessories.map((acessory, index) => (
+                  <Acessory name={acessory.name} icon={getAcessories(acessory.type)} key={index}/>
+                ))
+              }
+            </AcessoriesContainer>
         }
         </AcessoriesContainer>
         <RentalPeriod>
@@ -140,7 +150,7 @@ export default function SchedulingDetails() {
         <RentalPrice>
           <RentalPriceLabel>TOTAL</RentalPriceLabel>
           <RentalPriceDetails>
-            <RentalPriceQuota>{`R$ ${car.rent.price} x${dates.length} diárias`}</RentalPriceQuota>
+            <RentalPriceQuota>{`R$ ${car.price} x${dates.length} diárias`}</RentalPriceQuota>
             <RentalPriceTotal>R$ {rentTotal}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>
